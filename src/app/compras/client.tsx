@@ -7,10 +7,10 @@ import CompraForm from "@/components/compras/CompraForm";
 interface Compra {
   id:            string;
   data_compra:   string;
-  data_entrega:  string | undefined;  // ← só muda aqui
+  data_entrega:  string | undefined;
   status:        string;
-  observacoes:   string | null;
-  fornecedor:    { nome_fantasia: string } | null;
+  observacoes:   string | undefined;
+  fornecedor:    { nome_fantasia: string } | undefined;
   itens_count:   number;
   total:         number;
 }
