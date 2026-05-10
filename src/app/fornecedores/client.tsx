@@ -43,7 +43,7 @@ function CategoriaBadge({ cat }: { cat: string }) {
   );
 }
 
-function EntregaBadge({ modelo, prazo }: { modelo: string; prazo: number | null }) {
+function EntregaBadge({ modelo, prazo }: { modelo: string; prazo: number | null | undefined }) {
   const txt = modelo === "dias_uteis"
     ? `${prazo ?? "?"} dias úteis`
     : "Dia fixo";
