@@ -185,7 +185,7 @@ export default function ComprasClient() {
 
       {formAberto && (
         <CompraForm
-          inicial={editando ?? undefined}
+          inicial={editando ? editando as any : undefined}
           onSalvo={() => { setFormAberto(false); buscarCompras(); }}
           onCancelar={() => setFormAberto(false)}
         />

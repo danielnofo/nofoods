@@ -188,7 +188,7 @@ export default function IngredientesClient() {
 
       {formAberto && (
         <IngredienteForm
-          inicial={editando ?? undefined}
+          inicial={editando ? editando as any : undefined}
           onSalvo={() => { setFormAberto(false); buscarIngredientes(); }}
           onCancelar={() => setFormAberto(false)}
         />

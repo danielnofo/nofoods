@@ -199,7 +199,7 @@ export default function PratosClient() {
 
       {formAberto && (
         <PratoForm
-          inicial={editando ?? undefined}
+          inicial={editando ? editando as any : undefined}
           onSalvo={() => { setFormAberto(false); buscarPratos(); }}
           onCancelar={() => setFormAberto(false)}
         />
