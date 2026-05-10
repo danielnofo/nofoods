@@ -7,14 +7,14 @@ import FornecedorForm from "@/components/fornecedores/FornecedorForm";
 interface Fornecedor {
   id:               string;
   nome_fantasia:    string;
-  razao_social:     string | null;
+  razao_social:     string | undefined;
   categoria:        string;
-  nome_contato:     string | null;
-  whatsapp:         string | null;
-  email:            string | null;
+  nome_contato:     string | undefined;
+  whatsapp:         string | undefined;
+  email:            string | undefined;
   ativo:            boolean;
   modelo_entrega:   string;
-  prazo_dias_uteis: number | null;
+  prazo_dias_uteis: number | undefined;
 }
 
 const CATEGORIAS_FILTRO = [
