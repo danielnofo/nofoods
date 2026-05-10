@@ -202,7 +202,7 @@ export default function FornecedoresClient() {
 
       {formAberto && (
         <FornecedorForm
-          inicial={editando ?? undefined}
+          inicial={editando ? { ...editando, categoria: editando.categoria as any } : undefined}
           onSalvo={() => { setFormAberto(false); buscarFornecedores(); }}
           onCancelar={() => setFormAberto(false)}
         />
