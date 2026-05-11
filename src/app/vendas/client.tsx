@@ -9,6 +9,7 @@ interface Venda {
   canal:            string;
   forma_pagamento:  string;
   status:           string;
+  previsao_entrega: string | null;
   total:            number;
   subtotal:         number;
   taxa_entrega:     number;
@@ -61,11 +62,21 @@ export default function VendasClient() {
   const [canalFiltro, setCanalFiltro] = useState("todos");
   const [formAberto, setFormAberto]   = useState(false);
 
- const buscarVendas = useCallback(async () => {
+const buscarVendas = useCallback(async () => {
     setLoading(true);
     let query = supabase.from("vw_vendas").select("*");
-    if (statusFiltro !== "todos") query = query.eq("status", statusFiltro);
-    if (canalFiltro !== "todos")  query = query.eq("canal", canalFiltro);
+
+    if (statusFiltro === "atrasado") {
+      query = query
+        .not("previsao_entrega", "is", null)
+        .lt("previsao_entrega", new Date().toISOString())
+        .not("status", "in", "(entregue,cancelado)");
+    } else if (statusFiltro !== "todos") {
+      query = query.eq("status", statusFiltro);
+    }
+
+    if (canalFiltro !== "todos") query = query.eq("canal", canalFiltro);
+
     const { data, error } = await query;
     if (!error && data) setVendas(data);
     setLoading(false);
@@ -125,10 +136,10 @@ export default function VendasClient() {
       {/* FILTROS */}
       <div style={{ display:"flex", gap:16, marginBottom:16, flexWrap:"wrap" }}>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-          {["todos","pendente","confirmado","em_preparo","entregue","cancelado"].map(s => (
+          {["todos","pendente","confirmado","em_preparo","entregue","cancelado","atrasado"].map(s => (
             <button key={s} onClick={() => setStatusFiltro(s)}
               style={{ background: statusFiltro===s ? "#fce7f3" : "#f4f4f5", border:`1.5px solid ${statusFiltro===s ? "#ec4899" : "#e4e4e7"}`, borderRadius:20, padding:"4px 14px", fontSize:".75rem", fontWeight:600, color: statusFiltro===s ? "#9d174d" : "#666", cursor:"pointer" }}>
-              {STATUS_LABEL[s] || "Todos"}
+              {s === "atrasado" ? "⚠️ Atrasados" : STATUS_LABEL[s] || "Todos"}
             </button>
           ))}
         </div>
@@ -158,7 +169,7 @@ export default function VendasClient() {
           <table style={{ width:"100%", borderCollapse:"collapse" }}>
             <thead>
               <tr style={{ background:"#f9fafb", borderBottom:"1px solid #f0f0f0" }}>
-                {["Data/Hora","Canal","Cliente","Itens","Subtotal","Total","Pagamento","Status","Ações"].map(h => (
+                {["Data/Hora","Canal","Cliente","Itens","Subtotal","Total","Pagamento","Previsão","Status","Ações"].map(h => (
                   <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontSize:".68rem", fontWeight:700, textTransform:"uppercase", letterSpacing:.5, color:"#888", whiteSpace:"nowrap" }}>{h}</th>
                 ))}
               </tr>
@@ -193,6 +204,23 @@ export default function VendasClient() {
                   </td>
                   <td style={{ padding:"12px 14px", fontSize:".78rem", color:"#555" }}>
                     {item.forma_pagamento}
+                  </td>
+                  <td style={{ padding:"12px 14px", fontSize:".78rem", color:"#555" }}>
+                    {item.forma_pagamento}
+                  </td>
+                  <td style={{ padding:"12px 14px" }}>
+                    {item.previsao_entrega ? (
+                  <div>
+                  <div style={{ fontSize:".82rem", fontWeight:700, color: new Date(item.previsao_entrega) < new Date() && item.status !== "entregue" && item.status !== "cancelado" ? "#dc2626" : "#15803d" }}>
+                    {new Date(item.previsao_entrega).toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" })}
+                  </div>
+                    {new Date(item.previsao_entrega) < new Date() && item.status !== "entregue" && item.status !== "cancelado" && (
+                  <div style={{ fontSize:".65rem", background:"#fee2e2", color:"#dc2626", padding:"1px 6px", borderRadius:10, fontWeight:700, display:"inline-block", marginTop:2 }}>
+                    ⚠️ ATRASADO
+                  </div>
+                    )}
+                  </div>
+                    ) : <span style={{color:"#ccc"}}>—</span>}
                   </td>
                   <td style={{ padding:"12px 14px" }}>
                     <StatusBadge status={item.status} />
