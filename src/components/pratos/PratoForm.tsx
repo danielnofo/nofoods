@@ -276,6 +276,16 @@ export default function PratoForm({ inicial, onSalvo, onCancelar }: Props) {
                   </div>
                 </div>
                 <div>
+                  <label style={labelStyle}>Tempo de Preparo</label>
+                  <div style={{ display:"flex", border:"1.5px solid #e4e4e7", borderRadius:8, overflow:"hidden", background:"#fafafa" }}>
+                    <input type="number" min="1" max="120" step="1"
+                      value={(form as any).tempo_preparo_min || "15"}
+                      onChange={e => campo("tempo_preparo_min" as any, e.target.value)}
+                      style={{ border:"none", background:"transparent", flex:1, padding:"9px 12px", fontSize:".88rem", outline:"none", fontFamily:"inherit" }} />
+                    <span style={{ padding:"0 10px", background:"#f4f4f5", fontSize:".75rem", color:"#888", display:"flex", alignItems:"center", borderLeft:"1px solid #e4e4e7", fontWeight:600 }}>min</span>
+                  </div>
+                </div>
+                <div>
                   <label style={labelStyle}>Preço de Venda</label>
                   <div style={{ display:"flex", border:"1.5px solid #e4e4e7", borderRadius:8, overflow:"hidden", background:"#fafafa" }}>
                     <span style={{ padding:"0 10px", background:"#f4f4f5", fontSize:".75rem", color:"#888", display:"flex", alignItems:"center", borderRight:"1px solid #e4e4e7", fontWeight:600 }}>R$</span>
