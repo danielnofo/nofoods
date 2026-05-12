@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
 interface KPI {
@@ -53,6 +54,7 @@ const C = {
 
 export default function DashboardClient() {
   const supabase = createClient();
+  const router = useRouter();
   const hoje = new Date();
   const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split("T")[0];
   const hojeStr = hoje.toISOString().split("T")[0];
@@ -304,13 +306,13 @@ export default function DashboardClient() {
             <span style={{ fontSize:11, color: C.textSub }}>Clique para detalhes</span>
           </div>
           {estoque.filter(e=>e.nivel_estoque==="ruptura").map(e=>(
-            <div key={e.id} style={{ display:"flex", gap:8, padding:"8px 10px", borderRadius:8, marginBottom:6, fontSize:12, background:"#3a1a1a", color:"#f87171", cursor:"pointer" }}>
+            <div key={e.id} onClick={() => router.push("/estoque")} style={{ display:"flex", gap:8, padding:"8px 10px", borderRadius:8, marginBottom:6, fontSize:12, background:"#3a1a1a", color:"#f87171", cursor:"pointer" }}>
               <span style={{ flexShrink:0 }}>⚠</span>
               <div><div><strong>Ruptura:</strong> {e.nome} zerado.</div><div style={{ fontSize:11, opacity:.7, textDecoration:"underline", marginTop:2 }}>Ver estoque →</div></div>
             </div>
           ))}
           {estoque.filter(e=>e.nivel_estoque==="risco").map(e=>(
-            <div key={e.id} style={{ display:"flex", gap:8, padding:"8px 10px", borderRadius:8, marginBottom:6, fontSize:12, background:"#3a2a00", color:"#fbbf24", cursor:"pointer" }}>
+            <div key={e.id} onClick={() => router.push("/estoque")} style={{ display:"flex", gap:8, padding:"8px 10px", borderRadius:8, marginBottom:6, fontSize:12, background:"#3a2a00", color:"#fbbf24", cursor:"pointer" }}>
               <span style={{ flexShrink:0 }}>⚡</span>
               <div><div><strong>Risco:</strong> {e.nome} para {e.cobertura_dias??"-"} dias.</div><div style={{ fontSize:11, opacity:.7, textDecoration:"underline", marginTop:2 }}>Ver estoque →</div></div>
             </div>
