@@ -56,7 +56,7 @@ export default function FinanceiroClient() {
   const [formAberto, setFormAberto] = useState(false);
   const [editando, setEditando]     = useState<CustoOperacional | null>(null);
   const [abaAtiva, setAbaAtiva]     = useState<"dre"|"custos"|"config">("dre");
-  const [expandidos, setExpandidos] = useState<Set<string>>(new Set(["1","2","4","5","7","9"]));
+  const [expandidos, setExpandidos] = useState<Set<string>>(new Set());
 
   const fmt = (n: number) => n.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
 
@@ -118,27 +118,42 @@ export default function FinanceiroClient() {
     return () => clearTimeout(t);
   }, [buscarDados]);
 
-  function propagarTotais(contas: ContaDRE[]): ContaDRE[] {
-    const mapa = new Map<string, ContaDRE>();
-    contas.forEach(c => mapa.set(c.codigo, { ...c }));
+function propagarTotais(contas: ContaDRE[]): ContaDRE[] {
+  // Criar mapa apenas com totais PRÓPRIOS (lançamentos diretos)
+  const mapa = new Map<string, ContaDRE>();
+  contas.forEach(c => mapa.set(c.codigo, { ...c }));
 
-    // Ordenar por código decrescente (filhos antes dos pais)
-    const ordenados = [...contas].sort((a,b) => b.codigo.localeCompare(a.codigo));
+  // Zerar totais dos pais — eles serão recalculados pela soma dos filhos
+  mapa.forEach((conta) => {
+    const temFilho = contas.some(c =>
+      c.codigo.startsWith(conta.codigo + ".") &&
+      c.codigo.split(".").length === conta.codigo.split(".").length + 1
+    );
+    if (temFilho) {
+      mapa.get(conta.codigo)!.total = 0;
+    }
+  });
 
-    ordenados.forEach(conta => {
-      if (conta.pai_id) {
-        const pai = contas.find(c => c.codigo === conta.codigo.split(".").slice(0,-1).join("."));
-        if (pai) {
-          const paiAtual = mapa.get(pai.codigo);
-          if (paiAtual) {
-            paiAtual.total += mapa.get(conta.codigo)?.total || 0;
-          }
-        }
+  // Propagar de baixo para cima
+  const ordenados = [...mapa.values()].sort((a,b) => b.codigo.localeCompare(a.codigo));
+  ordenados.forEach(conta => {
+    const partes = conta.codigo.split(".");
+    if (partes.length > 1) {
+      const codigoPai = partes.slice(0,-1).join(".");
+      const pai = mapa.get(codigoPai);
+      if (pai) {
+        pai.total += mapa.get(conta.codigo)?.total || 0;
       }
-    });
+    }
+  });
 
-    return [...mapa.values()].sort((a,b) => a.codigo.localeCompare(b.codigo));
-  }
+  return [...mapa.values()].sort((a,b) => {
+    const numA = parseInt(a.codigo.split(".")[0]);
+    const numB = parseInt(b.codigo.split(".")[0]);
+    if (numA !== numB) return numA - numB;
+    return a.codigo.localeCompare(b.codigo);
+  });
+}
 
   function toggleExpandido(codigo: string) {
     setExpandidos(prev => {
@@ -170,9 +185,8 @@ export default function FinanceiroClient() {
 
   // Dias no período
   const diasPeriodo = Math.max(1, Math.round((new Date(dataFim).getTime() - new Date(dataInicio).getTime()) / 86400000) + 1);
-  const custosFixosPeriodo = custoFixoMensal / 30 * diasPeriodo;
   const custosOperacionais = contas.find(c => c.codigo==="7")?.total || 0;
-  const totalCustos = custosFixosPeriodo + custosOperacionais;
+  const totalCustos = custosOperacionais;
   const ebitda      = margemContrib - totalCustos;
   const resultFin   = contas.find(c => c.codigo==="9")?.total || 0;
   const lucroLiquido = ebitda - resultFin;
