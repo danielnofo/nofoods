@@ -446,7 +446,7 @@ function propagarTotais(contas: ContaDRE[]): ContaDRE[] {
 
       {formAberto && (
         <CustoForm
-          inicial={editando ?? undefined}
+          inicial={editando ? editando as any : undefined}
           onSalvo={() => { setFormAberto(false); buscarDados(); }}
           onCancelar={() => setFormAberto(false)}
         />
