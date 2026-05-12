@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [erro, setErro]         = useState<string | null>(null);
   const [modo, setModo]         = useState<"login"|"cadastro">("login");
   const [sucesso, setSucesso]   = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);  // ← regra para mostrar a senha
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -85,8 +86,14 @@ export default function LoginPage() {
 
           <div style={{ marginBottom:24 }}>
             <label style={{ fontSize:11, color: C.textSub, textTransform:"uppercase", letterSpacing:"0.5px", display:"block", marginBottom:6 }}>Senha</label>
-            <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="••••••••" required minLength={6}
-              style={{ width:"100%", height:40, padding:"0 12px", fontSize:13, background:"#0d0d0d", border:`1px solid ${C.border}`, borderRadius:8, color: C.text, outline:"none" }} />
+            <div style={{ position:"relative" }}>
+  <input type={mostrarSenha ? "text" : "password"} value={senha} onChange={e => setSenha(e.target.value)} placeholder="••••••••" required minLength={6}
+    style={{ width:"100%", height:40, padding:"0 40px 0 12px", fontSize:13, background:"#0d0d0d", border:`1px solid ${C.border}`, borderRadius:8, color: C.text, outline:"none", boxSizing:"border-box" }} />
+  <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)}
+    style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color: C.textSub, fontSize:16, padding:0, lineHeight:1 }}>
+    {mostrarSenha ? "🙈" : "👁️"}
+  </button>
+</div>
           </div>
 
           {erro && (
