@@ -20,9 +20,12 @@ const MENU = [
     { href: "/compras",      label: "Compras",      icon: "🛍️" },
     { href: "/fornecedores", label: "Fornecedores", icon: "🚚" },
   ]},
-  { group: "Financeiro",    items: [
-    { href: "/financeiro",   label: "Financeiro",   icon: "💰" },
-  ]},
+{ group: "Financeiro", items: [
+  { href: "/financeiro", label: "Financeiro", icon: "💰" },
+]},
+{ group: "Compliance", items: [
+  { href: "/lgpd", label: "LGPD", icon: "🔒" },
+]},
 ];
 
 export default function Nav() {
